@@ -169,13 +169,16 @@ module Thin
     # new requests and waits for all current connections to finish.
     # Calling twice is the equivalent of calling <tt>stop!</tt>.
     def stop
+      log_info "Trying to stop server gracefully"
       if running?
+        log_info "Server was running"
         @backend.stop
         unless @backend.empty?
           log_info "Waiting for #{@backend.size} connection(s) to finish, "\
                    "can take up to #{timeout} sec, CTRL+C to stop now"
         end
       else
+        log_info "Server was not running"
         stop!
       end
     end
@@ -245,7 +248,8 @@ module Thin
       end
 
       def handle_signals
-        case @signal_queue.shift
+        signal_received = @signal_queue.shift
+        case signal_received
         when 'INT'
           stop!
         when 'TERM', 'QUIT'
