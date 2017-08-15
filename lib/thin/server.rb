@@ -249,6 +249,7 @@ module Thin
 
       def handle_signals
         signal_received = @signal_queue.shift
+        log_info "received signal - #{signal_received}"
         case signal_received
         when 'INT'
           stop!
